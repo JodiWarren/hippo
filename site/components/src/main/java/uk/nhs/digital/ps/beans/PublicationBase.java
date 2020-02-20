@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.collections.IteratorUtils.toList;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.lang.StringUtils;
 import org.hippoecm.hst.container.RequestContextProvider;
 import org.hippoecm.hst.content.beans.query.HstQuery;
 import org.hippoecm.hst.content.beans.query.HstQueryResult;
@@ -228,11 +229,11 @@ public abstract class PublicationBase extends BaseDocument {
 
     @Override
     protected void assertPropertyPermitted(final String propertyKey) {
-
         final boolean isPropertyPermitted =
             isPropertyAlwaysPermitted(propertyKey)
                 || isPubliclyAccessible()
-                || propertiesPermittedWhenUpcoming.contains(propertyKey);
+                || propertiesPermittedWhenUpcoming.contains(propertyKey)
+                || correctAccessKey();
 
         if (!isPropertyPermitted) {
             throw new DataRestrictionViolationException(
@@ -241,9 +242,17 @@ public abstract class PublicationBase extends BaseDocument {
         }
     }
 
+    private boolean correctAccessKey() {
+        return StringUtils
+            .isNotBlank(getProperty(PublicationBase.PropertyKeys.EARLY_ACCESS_KEY))
+            && getProperty(PublicationBase.PropertyKeys.EARLY_ACCESS_KEY).equals(
+            RequestContextProvider.get().getServletRequest().getParameter("key"));
+    }
+
     private boolean isPropertyAlwaysPermitted(final String propertyKey) {
         return PropertyKeys.PARENT_BEAN.equals(propertyKey)
-            || PropertyKeys.PUBLICLY_ACCESSIBLE.equals(propertyKey);
+            || PropertyKeys.PUBLICLY_ACCESSIBLE.equals(propertyKey)
+            || PropertyKeys.EARLY_ACCESS_KEY.equals(propertyKey);
     }
 
     interface PropertyKeys {
@@ -267,6 +276,7 @@ public abstract class PublicationBase extends BaseDocument {
         String RELATED_LINKS = "publicationsystem:RelatedLinks";
         String RESOURCE_LINKS = "publicationsystem:ResourceLinks";
         String ATTACHMENTS_V3 = "publicationsystem:Attachments-v3";
+        String EARLY_ACCESS_KEY = "publicationsystem:earlyaccesskey";
 
         String PARENT_BEAN = "PARENT_BEAN";
         String PARENT_SERIES = "PARENT_SERIES";

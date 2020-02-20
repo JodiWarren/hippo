@@ -43,13 +43,13 @@
 <@fmt.message key="headers.datasets" var="datasetsHeader" />
 <@fmt.message key="headers.resources" var="resourcesHeader" />
 
-<#assign hasOldKeyfacts = publication.keyFacts.elements?has_content || keyFactImageSections?has_content />
-<#assign hasNewKeyfacts = (publication.keyFactsHead?? && publication.keyFactsHead.content?has_content)
-                            || (publication.keyFactsTail?? && publication.keyFactsTail.content?has_content)
-                            || (publication.keyFactInfographics?? && publication.keyFactInfographics?size >0)  />
-
 <#macro fullContentOfPubliclyAvailablePublication>
-    <@publicationHeader publication=publication/>
+    <#assign hasOldKeyfacts = publication.keyFacts.elements?has_content || keyFactImageSections?has_content />
+    <#assign hasNewKeyfacts = (publication.keyFactsHead?? && publication.keyFactsHead.content?has_content)
+        || (publication.keyFactsTail?? && publication.keyFactsTail.content?has_content)
+        || (publication.keyFactInfographics?? && publication.keyFactInfographics?size >0)  />
+
+    <@publicationHeader publication=publication earlyAccessKey=hstRequest.request.getParameter("key")/>
 
     <div class="grid-wrapper grid-wrapper--article" aria-label="Document Content">
 
@@ -217,7 +217,7 @@
                 <@lastModified publication.lastModified></@lastModified>
 
                 <div class="article-section no-border no-top-margin">
-                    <@pagination publication/>
+                    <@pagination page=publication earlyAccessKey=hstRequest.request.getParameter("key")/>
                 </div>
 
             </div>
@@ -229,7 +229,7 @@
 <#if publication?? >
     <article class="article article--publication" itemscope itemtype="http://schema.org/Dataset" aria-label="Document Header">
         <meta itemprop="license" content="https://digital.nhs.uk/about-nhs-digital/terms-and-conditions" />
-        <#if publication.publiclyAccessible>
+        <#if publication.publiclyAccessible || publication.isCorrectAccessKey(hstRequest.request.getParameter("key"))>
             <@fullContentOfPubliclyAvailablePublication/>
         <#else>
             <@restrictedContentOfUpcomingPublication/>

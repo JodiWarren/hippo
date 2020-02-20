@@ -1,7 +1,7 @@
 <#ftl output_format="HTML">
 <#include "../../include/imports.ftl">
 
-<#macro publicationHeader publication restricted=false>
+<#macro publicationHeader publication restricted=false earlyAccessKey="">
     <div class="grid-wrapper grid-wrapper--full-width grid-wrapper--wide">
         <div class="local-header article-header article-header--detailed">
             <div class="grid-wrapper">
@@ -102,7 +102,10 @@
                 <ul class="list list--reset cta-list">
                     <#list chunks[0] as page>
                         <li itemprop="hasPart" itemscope itemtype="http://schema.org/WebPage">
-                            <a itemprop="url" href="<@hst.link hippobean=page.linkedBean/>" title="${page.title}"><span itemprop="name">${page.title}</span></a>
+                            <a itemprop="url" href="<@hst.link hippobean=page.linkedBean>
+                                                        <#if earlyAccessKey?has_content><@hst.param name="key" value="${earlyAccessKey}"/></#if>
+                                                    </@hst.link>"
+                               title="${page.title}"><span itemprop="name">${page.title}</span></a>
                         </li>
                     </#list>
                 </ul>
@@ -111,7 +114,10 @@
                 <ul class="list list--reset ">
                     <#list chunks[1] as page>
                         <li itemprop="hasPart" itemscope itemtype="http://schema.org/WebPage">
-                            <a itemprop="url" href="<@hst.link hippobean=page.linkedBean/>" title="${page.title}"><span itemprop="name">${page.title}</span></a>
+                            <a itemprop="url" href="<@hst.link hippobean=page.linkedBean>
+                                                        <#if earlyAccessKey?has_content><@hst.param name="key" value="${earlyAccessKey}"/></#if>
+                                                    </@hst.link>"
+                               title="${page.title}"><span itemprop="name">${page.title}</span></a>
                         </li>
                     </#list>
                 </ul>

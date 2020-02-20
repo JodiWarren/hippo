@@ -89,6 +89,17 @@ definitions:
             jcr:primaryType: frontend:plugin
             plugin.class: org.hippoecm.frontend.editor.plugins.field.PropertyFieldPlugin
             wicket.id: ${cluster.id}.left.item
+          /earlyaccesskey:
+            /cluster.options:
+              jcr:primaryType: frontend:pluginconfig
+              maxlength: '64'
+              size: '64'
+            caption: Early access key
+            field: earlyaccesskey
+            hint: ''
+            jcr:primaryType: frontend:plugin
+            plugin.class: uk.nhs.digital.common.earlyaccess.EarlyAccessKeyPlugin
+            wicket.id: ${cluster.id}.left.item
           /Summary:
             /cluster.options:
               jcr:primaryType: frontend:pluginconfig
@@ -328,6 +339,14 @@ definitions:
             hipposysedit:primary: false
             hipposysedit:type: CalendarDate
             jcr:primaryType: hipposysedit:field
+          /earlyaccesskey:
+            hipposysedit:mandatory: false
+            hipposysedit:multiple: false
+            hipposysedit:ordered: false
+            hipposysedit:path: publicationsystem:earlyaccesskey
+            hipposysedit:primary: false
+            hipposysedit:type: String
+            jcr:primaryType: hipposysedit:field
           /granularity:
             hipposysedit:mandatory: false
             hipposysedit:multiple: true
@@ -494,6 +513,7 @@ definitions:
           publicationsystem:PubliclyAccessible: false
           publicationsystem:Summary: ''
           publicationsystem:Title: ''
+          publicationsystem:earlyaccesskey: ''
         jcr:primaryType: hipposysedit:prototypeset
       jcr:mixinTypes:
       - editor:editable

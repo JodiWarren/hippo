@@ -1,19 +1,26 @@
 package uk.nhs.digital.ps.beans;
 
+import org.apache.commons.lang.StringUtils;
 import org.hippoecm.hst.content.beans.Node;
 import org.hippoecm.hst.content.beans.standard.HippoHtml;
 import org.onehippo.cms7.essentials.dashboard.annotations.HippoEssentialsGenerated;
 import uk.nhs.digital.pagination.Paginated;
 import uk.nhs.digital.pagination.Pagination;
 import uk.nhs.digital.ps.beans.structuredText.StructuredText;
+import uk.nhs.digital.ps.directives.DateFormatterDirective;
 import uk.nhs.digital.website.beans.Infographic;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @HippoEssentialsGenerated(internalName = "publicationsystem:publication")
 @Node(jcrType = "publicationsystem:publication")
 public class Publication extends PublicationBase implements Paginated {
+
+    private static final int HOUR_OF_PUBLIC_RELEASE = 9;
+    private static final int MINUTE_OF_PUBLIC_RELEASE = 30;
 
     @HippoEssentialsGenerated(internalName = PublicationBase.PropertyKeys.SUMMARY)
     public StructuredText getSummary() {
@@ -63,6 +70,22 @@ public class Publication extends PublicationBase implements Paginated {
         return getParentBean().getChildBeans(PublicationPage.class);
     }
 
+    public Boolean getBeforePublicationDate() {
+        Calendar publicationDate = getProperty(PropertyKeys.NOMINAL_DATE);
+        if (publicationDate == null) {
+            return false;
+        }
+        LocalDateTime publicationDateTime = publicationDate.toInstant()
+            .atZone(DateFormatterDirective.TIME_ZONE.toZoneId()).toLocalDateTime()
+            .withHour(HOUR_OF_PUBLIC_RELEASE).withMinute(MINUTE_OF_PUBLIC_RELEASE)
+            .withSecond(0);
+
+        LocalDateTime currentDateTime = LocalDateTime
+            .now(DateFormatterDirective.TIME_ZONE.toZoneId());
+
+        return currentDateTime.isBefore(publicationDateTime);
+    }
+
     public List<IndexPage> getPageIndex() {
         List<IndexPage> pages = new ArrayList<>(getPages());
 
@@ -77,5 +100,12 @@ public class Publication extends PublicationBase implements Paginated {
     @Override
     public Pagination paginate() {
         return new Pagination(null, getPageIndex().stream().skip(1).findFirst().orElse(null));
+    }
+
+    public Boolean isCorrectAccessKey(String accessKey) {
+        return StringUtils
+            .isNotBlank(getProperty(PublicationBase.PropertyKeys.EARLY_ACCESS_KEY))
+            && getProperty(PublicationBase.PropertyKeys.EARLY_ACCESS_KEY)
+            .equals(accessKey);
     }
 }
