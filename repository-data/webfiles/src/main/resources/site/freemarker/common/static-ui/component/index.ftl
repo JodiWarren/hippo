@@ -8,6 +8,14 @@
         <div class="hub-box-list">
             <article class="hub-box">
                 <div class="hub-box__contents">
+                    <h2 class="hub-box__title"><a href="/site/static-ui/component/checklist">Checklist</a></h2>
+                    <span class="hub-box__meta">Created February 2020</span>
+                    <p class="hub-box__text">Use the checklist component to display itemised lists with visual markers to signify state of each list items.</p>
+                </div>
+            </article>
+
+            <article class="hub-box">
+                <div class="hub-box__contents">
                     <h2 class="hub-box__title"><a href="/site/static-ui/component/update-box">Update box</a></h2>
                     <span class="hub-box__meta">Created January 2020</span>
                     <p class="hub-box__text">Use the update box component to display an emphasis box when a user creates a service update.</p>

@@ -11,6 +11,10 @@ definitions:
           hst:componentconfigurationid: hst:pages/static-ui-component-block-link
           hst:relativecontentpath: component/block-link
           jcr:primaryType: hst:sitemapitem
+        /checklist:
+          hst:componentconfigurationid: hst:pages/static-ui-component-checklist
+          hst:relativecontentpath: component/checklist
+          jcr:primaryType: hst:sitemapitem
         /hub-box:
           hst:componentconfigurationid: hst:pages/static-ui-component-hub-box
           hst:relativecontentpath: component/hub-box
