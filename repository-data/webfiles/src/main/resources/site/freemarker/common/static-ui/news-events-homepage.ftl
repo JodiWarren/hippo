@@ -56,10 +56,9 @@
                     <h2>${latestNews}</h2>
                     <div class="grid-row">
                         <div class="column column--reset">
-                            <div class="hub-box-list" id="${slugify(latestNews)}-list">
+                            <div class="hub-box-list bottom-margin-20" id="${slugify(latestNews)}-list">
                                 <#assign newsData = [{}, {}] />
                                 <#list newsData as news>
-                                    <@hst.webfile path="images/test-image.jpg" var="backgroundImage" />
                                     <#assign data = {"title": "HSCN Summit 2018", "date": "18 January 2018", "text": "Conveniently orchestrate user friendly models without revolutionary.", "imagesection": "EMPTY", "link": "#" } />
                                     <#assign data += noBorder + noBackgroundCol + noPadding />
                                     <@hubBox data ></@hubBox>
@@ -67,7 +66,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="grid-row" style="margin: 20px 0">
+                    <div class="grid-row bottom-margin-20">
                         <a href="#">View all news</a>
                     </div>
                 </div>
@@ -76,7 +75,7 @@
                     <h2>${features}</h2>
                     <div class="grid-row">
                         <div class="column column--reset">
-                            <div class="hub-box-list" id="${slugify(features)}-list">
+                            <div class="hub-box-list bottom-margin-20" id="${slugify(features)}-list">
                                 <#assign newsData = [{}, {}] />
                                 <#list newsData as news>
                                     <@hst.webfile path="images/test-image.jpg" var="backgroundImage" />
@@ -93,7 +92,7 @@
                     <h2>${latestBlogs}</h2>
                     <div class="grid-row">
                         <div class="column column--reset">
-                            <div class="hub-box-list" id="${slugify(latestBlogs)}-list">
+                            <div class="hub-box-list bottom-margin-20" id="${slugify(latestBlogs)}-list">
                                 <#assign newsData = [{}] />
                                 <#list newsData as news>
                                     <#assign data = {"title": "HSCN Summit 2018", "date": "18 January 2018", "text": "Conveniently orchestrate user friendly models without revolutionary.", "imagesection": "EMPTY", "link": "#" } />
@@ -103,7 +102,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="grid-row" style="margin: 20px 0">
+                    <div class="grid-row bottom-margin-20">
                         <a href="#">View all blogs</a>
                     </div>
                 </div>
