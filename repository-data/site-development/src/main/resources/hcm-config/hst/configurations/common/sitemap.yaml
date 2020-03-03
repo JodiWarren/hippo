@@ -70,6 +70,10 @@ definitions:
         hst:componentconfigurationid: hst:pages/static-ui-news-hub
         hst:relativecontentpath: static-ui/news-hub
         jcr:primaryType: hst:sitemapitem
+      /news-events-homepage:
+        hst:componentconfigurationid: hst:pages/static-ui-news-events-homepage
+        hst:relativecontentpath: static-ui/news-events-homepage
+        jcr:primaryType: hst:sitemapitem
       /service:
         hst:componentconfigurationid: hst:pages/static-ui-service
         hst:relativecontentpath: static-ui/service
