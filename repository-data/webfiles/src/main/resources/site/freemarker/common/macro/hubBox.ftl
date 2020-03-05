@@ -3,26 +3,24 @@
 
 <#macro hubBox options>
     <#if options??>
-        <#assign hasImageSection = options.imagesection?? />
-        <article class="hub-box${(options.sameStyle??)?then(' hub-box--same-style', '')}${(options.noPadding??)?then(' hub-box--no-padding', '')}${(options.noBackgroundCol??)?then(' hub-box--no-background-col', '')}${(options.light??)?then(' hub-box--light', '')}">
+        <article class="hub-box${(options.imagesection??)?then(' hub-box--with-icon', '')}">
             <#if options.background??>
             <div class="hub-box__image" style="background-image: url('${options.background}');"></div>
             </#if>
 
-            <#if hasImageSection>
-              <div class="hub-box-with-icon${(options.noBorder??)?then(' hub-box-with-icon--no-border', '')}">
+            <#if options.imagesection??>
                 <div class="hub-box__icon">
                   <#if options.imagesection != "EMPTY">
                   <#assign alttext = options.imagesection.alttext />
                   </#if>
 
                   <#if options.imagesection == "EMPTY">
-                      <img class="hub-box__icon__nhsimg" src="<@hst.webfile path="/images/fibre_57101102_med.jpg"/>" alt="NHS Digital article" >
+                      <img class="hub-box__icon-img" src="<@hst.webfile path='/images/fibre_57101102_med.jpg'/>" alt="NHS Digital article" >
                   <#elseif options.imagesection?has_content && options.imagesection.leadImage?has_content>
                       <@hst.link hippobean=options.imagesection.leadImage.original fullyQualified=true var="leadImage" />
-                      <img class="hub-box__icon__img" src="${leadImage}" alt="${alttext}" />
+                      <img class="hub-box__icon-img" src="${leadImage}" alt="${alttext}" />
                   <#else>
-                      <img class="hub-box__icon__nhsimg" src="<@hst.webfile path="/images/fibre_57101102_med.jpg"/>" alt="NHS Digital article" >
+                      <img class="hub-box__icon-img" src="<@hst.webfile path='/images/fibre_57101102_med.jpg'/>" alt="NHS Digital article" >
                   </#if>
                 </div>
             </#if>
@@ -52,6 +50,20 @@
                 <p class="hub-box__text">${options.text}</p>
                 </#if>
 
+                <#if options.relatedLinks?has_content>
+                    <div class="hub-box__links">
+                        <span class="hub-box__links-title">Related to:</span>
+                        <ul class="hub-box__links-list">
+                            <#list options.relatedLinks as link>
+                                <li>
+                                    <a class="hub-box__links-anchor" href="${link.url}">${link.title}</a>
+                                </li>
+                            </#list>
+                        </ul>
+                    </div>
+
+                </#if>
+
                 <#if options.types??>
                 <ul class="tag-list">
                 <#list options.types as type>
@@ -60,9 +72,6 @@
                 </ul>
                 </#if>
             </div>
-            <#if hasImageSection>
-            </div>
-            </#if>
         </article>
     </#if>
 </#macro>

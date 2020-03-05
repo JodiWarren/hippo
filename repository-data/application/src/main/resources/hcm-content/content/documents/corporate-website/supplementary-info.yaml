@@ -3,7 +3,7 @@
   hippo:name: Supplementary Info
   hippostd:foldertype:
   - new-supplementary-info-folder
-  - new-supplementary-info-document
+  - new-supplementary-info-hub-document
   hippotranslation:id: b882e700-3c83-411d-8ecf-c987151ce955
   hippotranslation:locale: en
   jcr:mixinTypes:
