@@ -7,9 +7,10 @@
 <#include "../macro/stickyGroupBlockHeader.ftl">
 
 <#assign latestNews="Latest news" />
-<#assign features="Features" />
 <#assign latestBlogs="Latest blog" />
 <#assign resources="Resources" />
+<#assign contactUs="Contact us" />
+<#assign followSocial="Follow us on social media" />
 
 <#assign noBorder = {"noBorder": true} />
 <#assign noPadding = {"noPadding": true} />
@@ -39,7 +40,7 @@
         <div class="grid-row">
             <div class="column column--one-quarter page-block page-block--sidebar">
                 <div id="sticky-nav">
-                    <#assign index = [latestNews, features, latestBlogs, resources] />
+                    <#assign index = [latestNews, latestBlogs, resources, contactUs, followSocial] />
 
                     <#assign links = [] />
 
@@ -71,23 +72,6 @@
                     </div>
                 </div>
 
-                <div class="article-section article-section--letter-group" id="${slugify(features)}">
-                    <h2>${features}</h2>
-                    <div class="grid-row">
-                        <div class="column column--reset">
-                            <div class="hub-box-list bottom-margin-20" id="${slugify(features)}-list">
-                                <#assign newsData = [{}, {}] />
-                                <#list newsData as news>
-                                    <@hst.webfile path="images/test-image.jpg" var="backgroundImage" />
-                                    <#assign data = {"title": "HSCN Summit 2018", "text": "Conveniently orchestrate user friendly models without revolutionary.", "imagesection": "EMPTY", "link": "#" } />
-                                    <#assign data += noBorder + noBackgroundCol + noPadding + sameStyle/>
-                                    <@hubBox data ></@hubBox>
-                                </#list>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="article-section article-section--letter-group" id="${slugify(latestBlogs)}">
                     <h2>${latestBlogs}</h2>
                     <div class="grid-row">
@@ -111,7 +95,7 @@
                     <h2>${resources}</h2>
                     <div class="grid-row">
                         <div class="column column--reset">
-                            <div class="hub-box-list" id="${slugify(resources)}-list">
+                            <div class="hub-box-list bottom-margin-20" id="${slugify(resources)}-list">
                                 <#assign resources = [
                                 {"title": "Upcoming events", "text": "Conveniently orchestrate user friendly models without revolutionary.", "link": "#" },
                                 {"title": "Journalist and media resources", "text": "Conveniently orchestrate user friendly models without revolutionary.", "link": "#" },
@@ -124,6 +108,43 @@
                                     <#assign item += noBorder + noBackgroundCol + noPadding + sameStyle/>
                                     <@hubBox item ></@hubBox>
                                 </#list>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="article-section article-section--letter-group" id="${slugify(contactUs)}">
+                    <h2>${contactUs}</h2>
+                    <div class="grid-row">
+                        <div class="column column--reset bottom-margin-20">
+                            <p>To report an urgent cyber security issue, call 0300 303 5222 or email: <a href="#">carecert@nhsdigital.nhs.uk</a></p>
+                            <p>For general queries, to sign-up to any of our services or to give us feedback, telephone: 0300 303 5222 or email: <a href="#">carecert@nhsdigital.nhs.uk</a></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="article-section article-section--letter-group" id="${slugify(followSocial)}">
+                    <h2>${followSocial}</h2>
+                    <div class="grid-row">
+                        <div class="column column--reset">
+                            <div class="blog-social">
+                                <div class="blog-social-icon like-first-child">
+                                    <a target="_blank" href="https://www.facebook.com/NHSDigitalOfficial/">
+                                        <img src="<@hst.webfile path="/images/icon/Facebook.svg"/>" alt="Follow on Facebook" class="blog-social-icon__img" />
+                                    </a>
+                                </div>
+
+                                <div class="blog-social-icon like-first-child">
+                                    <a target="_blank" href="https://twitter.com/NHSDigital">
+                                        <img src="<@hst.webfile path="/images/icon/Twitter.svg"/>" alt="Follow on Twitter" class="blog-social-icon__img" />
+                                    </a>
+                                </div>
+
+                                <div class="blog-social-icon like-first-child">
+                                    <a target="_blank" href="https://www.linkedin.com/company/nhs-digital">
+                                        <img src="<@hst.webfile path="/images/icon/LinkedIn.svg"/>" alt="Follow on LinkedIn" class="blog-social-icon__img" />
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
