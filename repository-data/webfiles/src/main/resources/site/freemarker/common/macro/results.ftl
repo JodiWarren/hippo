@@ -87,7 +87,7 @@
             </div>
         </#if>
 
-        <#if item.publiclyAccessible>
+        <#if !item.beforePublicationDate>
             <p class="cta__text" data-uipath="ps.search-results.result.summary">
                 <@truncate text=item.summary.firstParagraph size="300"/>
             </p>

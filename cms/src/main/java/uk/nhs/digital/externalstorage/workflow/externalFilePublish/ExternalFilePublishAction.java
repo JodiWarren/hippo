@@ -1,5 +1,7 @@
 package uk.nhs.digital.externalstorage.workflow.externalFilePublish;
 
+import static uk.nhs.digital.externalstorage.workflow.externalFilePublish.ExternalFilePublishTask.LONDON_ZONE_ID;
+
 import org.apache.commons.scxml2.SCXMLExpressionException;
 import org.apache.commons.scxml2.model.ModelException;
 import org.hippoecm.repository.HippoStdNodeType;
@@ -7,11 +9,13 @@ import org.onehippo.cms7.services.HippoServiceRegistry;
 import org.onehippo.repository.documentworkflow.action.AbstractDocumentTaskAction;
 import uk.nhs.digital.externalstorage.s3.PooledS3Connector;
 
+import java.time.Clock;
+
 public class ExternalFilePublishAction extends AbstractDocumentTaskAction<ExternalFilePublishTask> {
 
     @Override
     protected ExternalFilePublishTask createWorkflowTask() {
-        return new ExternalFilePublishTask();
+        return new ExternalFilePublishTask(Clock.system(LONDON_ZONE_ID));
     }
 
     @Override

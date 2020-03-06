@@ -21,10 +21,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.nhs.digital.common.util.DocumentUtils;
 import uk.nhs.digital.ps.components.DocumentTitleComparator;
+import uk.nhs.digital.ps.directives.DateFormatterDirective;
 import uk.nhs.digital.ps.site.exceptions.DataRestrictionViolationException;
 import uk.nhs.digital.website.beans.News;
 import uk.nhs.digital.website.beans.Update;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,10 +37,12 @@ public abstract class PublicationBase extends BaseDocument {
     private static final Collection<String> propertiesPermittedWhenUpcoming = asList(
         PropertyKeys.TITLE,
         PropertyKeys.NOMINAL_DATE,
-        PropertyKeys.PUBLICLY_ACCESSIBLE,
         PropertyKeys.INFORMATION_TYPE,
         PropertyKeys.PARENT_SERIES
     );
+
+    public static final int HOUR_OF_PUBLIC_RELEASE = 9;
+    public static final int MINUTE_OF_PUBLIC_RELEASE = 30;
 
     private RestrictableDate nominalPublicationDate;
 
@@ -184,7 +188,7 @@ public abstract class PublicationBase extends BaseDocument {
     }
 
     public boolean isPubliclyAccessible() {
-        return getPropertyIfPermitted(PropertyKeys.PUBLICLY_ACCESSIBLE);
+        return !getBeforePublicationDate();
     }
 
     @HippoEssentialsGenerated(internalName = PropertyKeys.RELATED_LINKS)
@@ -227,6 +231,22 @@ public abstract class PublicationBase extends BaseDocument {
         ).collect(Collectors.toList());
     }
 
+    public Boolean getBeforePublicationDate() {
+        Calendar publicationDate = getProperty(PropertyKeys.NOMINAL_DATE);
+        if (publicationDate == null) {
+            return false;
+        }
+        LocalDateTime publicationDateTime = publicationDate.toInstant()
+            .atZone(DateFormatterDirective.TIME_ZONE.toZoneId()).toLocalDateTime()
+            .withHour(HOUR_OF_PUBLIC_RELEASE).withMinute(MINUTE_OF_PUBLIC_RELEASE)
+            .withSecond(0);
+
+        LocalDateTime currentDateTime = LocalDateTime
+            .now(DateFormatterDirective.TIME_ZONE.toZoneId());
+
+        return currentDateTime.isBefore(publicationDateTime);
+    }
+
     @Override
     protected void assertPropertyPermitted(final String propertyKey) {
         final boolean isPropertyPermitted =
@@ -251,7 +271,6 @@ public abstract class PublicationBase extends BaseDocument {
 
     private boolean isPropertyAlwaysPermitted(final String propertyKey) {
         return PropertyKeys.PARENT_BEAN.equals(propertyKey)
-            || PropertyKeys.PUBLICLY_ACCESSIBLE.equals(propertyKey)
             || PropertyKeys.EARLY_ACCESS_KEY.equals(propertyKey);
     }
 
@@ -272,7 +291,6 @@ public abstract class PublicationBase extends BaseDocument {
         String GRANULARITY = "publicationsystem:Granularity";
         String ADMINISTRATIVE_SOURCES = "publicationsystem:AdministrativeSources";
         String TITLE = "publicationsystem:Title";
-        String PUBLICLY_ACCESSIBLE = "publicationsystem:PubliclyAccessible";
         String RELATED_LINKS = "publicationsystem:RelatedLinks";
         String RESOURCE_LINKS = "publicationsystem:ResourceLinks";
         String ATTACHMENTS_V3 = "publicationsystem:Attachments-v3";

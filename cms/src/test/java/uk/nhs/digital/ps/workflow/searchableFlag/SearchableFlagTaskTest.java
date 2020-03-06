@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -17,11 +18,16 @@ import org.hippoecm.repository.api.WorkflowException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.onehippo.repository.documentworkflow.DocumentHandle;
 import org.onehippo.repository.documentworkflow.DocumentVariant;
 import uk.nhs.digital.ps.JcrProvider;
 
 import java.io.FileInputStream;
+import java.time.Clock;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import javax.jcr.Node;
@@ -31,7 +37,9 @@ import javax.jcr.Session;
 @RunWith(DataProviderRunner.class)
 public class SearchableFlagTaskTest {
 
-    private SearchableFlagTask searchableFlagTask = new SearchableFlagTask();
+    @Mock
+    Clock clock;
+    private SearchableFlagTask searchableFlagTask = new SearchableFlagTask(clock);
     private Session session;
     private Node rootNode = null;
 
@@ -39,23 +47,31 @@ public class SearchableFlagTaskTest {
 
     @Before
     public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+
         session = new JcrProvider()
-            .getJcrFromFixture(new FileInputStream("src/test/resources/searchableFlagUnitTestJcrFixture.yml"));
+            .getJcrFromFixture(new FileInputStream(
+                "src/test/resources/searchableFlagUnitTestJcrFixture.yml"));
         rootNode = session.getRootNode();
 
         WorkflowContext workflowContext = mock(WorkflowContext.class);
         given(workflowContext.getInternalWorkflowSession()).willReturn(session);
         searchableFlagTask.setWorkflowContext(workflowContext);
+        when(clock.instant()).thenReturn(
+            LocalDateTime.of(2017, 3, 2, 0, 0).toInstant(ZoneOffset.UTC));
     }
 
     private String getResult(String state) {
         switch (state) {
             case HippoStdNodeType.PUBLISHED:
-                return RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset";
+                return RPS_ROOT_FOLDER
+                    + "/publication-with-datasets/dataset/dataset";
             case HippoStdNodeType.DRAFT:
-                return RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset[2]";
+                return RPS_ROOT_FOLDER
+                    + "/publication-with-datasets/dataset/dataset[2]";
             case HippoStdNodeType.UNPUBLISHED:
-                return RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset[3]";
+                return RPS_ROOT_FOLDER
+                    + "/publication-with-datasets/dataset/dataset[3]";
             default:
                 throw new RuntimeException("Unknown state: " + state);
         }
@@ -63,14 +79,17 @@ public class SearchableFlagTaskTest {
 
     @Test
     @UseDataProvider("unpublishDocuments")
-    public void shouldUpdateDatasetOnDepublishTest(List<String> changed, List<String> unchanged) throws Exception {
+    public void shouldUpdateDatasetOnDepublishTest(List<String> changed,
+        List<String> unchanged) throws Exception {
         // mock query results
         MockJcr.setQueryResult(session, getQueryResults(singletonList(
-            RPS_ROOT_FOLDER + "/accessible-publication-with-datasets/dataset/dataset"
+            RPS_ROOT_FOLDER
+                + "/accessible-publication-with-datasets/dataset/dataset"
         )));
 
         // process publication and datasets
-        execute("/accessible-publication-with-datasets/content", HippoStdNodeType.PUBLISHED, true);
+        execute("/accessible-publication-with-datasets/content",
+            HippoStdNodeType.PUBLISHED, true);
 
         for (int i = 0; i < changed.size(); i++) {
             assertFalse(
@@ -89,7 +108,8 @@ public class SearchableFlagTaskTest {
 
     @Test
     @UseDataProvider("datasetDocumentState")
-    public void shouldUpdateDocumentWithGivenStatusTest(final String state, List<String> changed, List<String> unchanged) throws Exception {
+    public void shouldUpdateDocumentWithGivenStatusTest(final String state,
+        List<String> changed, List<String> unchanged) throws Exception {
 
         // process publication and datasets
         execute("/publication-with-datasets/dataset", state, false);
@@ -111,7 +131,8 @@ public class SearchableFlagTaskTest {
 
     @Test
     @UseDataProvider("datasetInSubfolder")
-    public void shouldUpdateDatasetFromSubfolder(final String state, List<String> changed, List<String> unchanged) throws Exception {
+    public void shouldUpdateDatasetFromSubfolder(final String state,
+        List<String> changed, List<String> unchanged) throws Exception {
 
         // process datasets from within subfolder
         execute("/publication-with-datasets/subfolder/dataset", state, false);
@@ -131,7 +152,8 @@ public class SearchableFlagTaskTest {
         }
     }
 
-    private void execute(String path, String state, boolean depublishing) throws RepositoryException, WorkflowException {
+    private void execute(String path, String state, boolean depublishing)
+        throws RepositoryException, WorkflowException {
         Node node = getNode(RPS_ROOT_FOLDER + path);
         DocumentHandle handle = new DocumentHandle(node);
         handle.initialize();
@@ -144,18 +166,22 @@ public class SearchableFlagTaskTest {
 
     @DataProvider
     public static Object[][] datasetDocumentState() {
-        return new Object[][] {
+        return new Object[][]{
             {
                 "draft",
                 asList(
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset[2]"
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/dataset/dataset[2]"
                 ),
                 asList(
                     RPS_ROOT_FOLDER + "/publication-with-datasets/content/content",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/content/content[2]",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/content/content[3]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/content/content[2]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/content/content[3]",
                     RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset[3]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/dataset/dataset[3]",
                     // unrelated dataset should not be changed
                     RPS_ROOT_FOLDER + "/random-folder/dataset/dataset",
                     RPS_ROOT_FOLDER + "/random-folder/dataset/dataset[2]",
@@ -169,10 +195,14 @@ public class SearchableFlagTaskTest {
                 ),
                 asList(
                     RPS_ROOT_FOLDER + "/publication-with-datasets/content/content",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/content/content[2]",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/content/content[3]",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset[2]",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset[3]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/content/content[2]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/content/content[3]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/dataset/dataset[2]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/dataset/dataset[3]",
                     // unrelated dataset should not be changed
                     RPS_ROOT_FOLDER + "/random-folder/dataset/dataset",
                     RPS_ROOT_FOLDER + "/random-folder/dataset/dataset[2]",
@@ -184,16 +214,21 @@ public class SearchableFlagTaskTest {
 
     @DataProvider
     public static Object[][] unpublishDocuments() {
-        return new Object[][] {
+        return new Object[][]{
             {
                 asList(
-                    RPS_ROOT_FOLDER + "/accessible-publication-with-datasets/dataset/dataset"
+                    RPS_ROOT_FOLDER
+                        + "/accessible-publication-with-datasets/dataset/dataset"
                 ),
                 asList(
-                    RPS_ROOT_FOLDER + "/accessible-publication-with-datasets/content/content[2]",
-                    RPS_ROOT_FOLDER + "/accessible-publication-with-datasets/content/content[3]",
-                    RPS_ROOT_FOLDER + "/accessible-publication-with-datasets/dataset/dataset[2]",
-                    RPS_ROOT_FOLDER + "/accessible-publication-with-datasets/dataset/dataset[3]",
+                    RPS_ROOT_FOLDER
+                        + "/accessible-publication-with-datasets/content/content[2]",
+                    RPS_ROOT_FOLDER
+                        + "/accessible-publication-with-datasets/content/content[3]",
+                    RPS_ROOT_FOLDER
+                        + "/accessible-publication-with-datasets/dataset/dataset[2]",
+                    RPS_ROOT_FOLDER
+                        + "/accessible-publication-with-datasets/dataset/dataset[3]",
                     // unrelated dataset should not be changed
                     RPS_ROOT_FOLDER + "/random-folder/dataset/dataset",
                     RPS_ROOT_FOLDER + "/random-folder/dataset/dataset[2]",
@@ -205,24 +240,31 @@ public class SearchableFlagTaskTest {
 
     @DataProvider
     public static Object[][] datasetInSubfolder() {
-        return new Object[][] {
+        return new Object[][]{
             {
                 "draft",
                 asList(
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/subfolder/dataset/dataset[2]"
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/subfolder/dataset/dataset[2]"
                 ),
                 asList(
                     // publication unchanged
                     RPS_ROOT_FOLDER + "/publication-with-datasets/content/content",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/content/content[2]",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/content/content[3]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/content/content[2]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/content/content[3]",
                     // the second dataset attached to parent publication unchanged
                     RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset[2]",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/dataset/dataset[3]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/dataset/dataset[2]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/dataset/dataset[3]",
                     // draft and live version unchanged
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/subfolder/dataset/dataset",
-                    RPS_ROOT_FOLDER + "/publication-with-datasets/subfolder/dataset/dataset[3]",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/subfolder/dataset/dataset",
+                    RPS_ROOT_FOLDER
+                        + "/publication-with-datasets/subfolder/dataset/dataset[3]",
                     // unrelated dataset should not be changed
                     RPS_ROOT_FOLDER + "/random-folder/dataset/dataset",
                     RPS_ROOT_FOLDER + "/random-folder/dataset/dataset[2]",
@@ -232,7 +274,8 @@ public class SearchableFlagTaskTest {
         };
     }
 
-    public List<Node> getQueryResults(List<String> paths) throws RepositoryException {
+    public List<Node> getQueryResults(List<String> paths)
+        throws RepositoryException {
         List<Node> nodes = new ArrayList<>();
 
         for (int i = 0; i < paths.size(); i++) {
@@ -246,7 +289,8 @@ public class SearchableFlagTaskTest {
         return rootNode.getNode(path);
     }
 
-    protected Boolean getNodeBooleanProperty(String path, String propertyName) throws RepositoryException {
+    protected Boolean getNodeBooleanProperty(String path, String propertyName)
+        throws RepositoryException {
         return rootNode.getNode(path).getProperty(propertyName).getBoolean();
     }
 }

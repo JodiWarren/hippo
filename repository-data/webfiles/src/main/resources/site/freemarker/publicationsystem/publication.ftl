@@ -162,7 +162,7 @@
                         <ul data-uipath="ps.publication.resources-attachments" class="list list--reset">
                         <#list publication.attachments as attachment>
                             <li class="attachment" itemprop="distribution" itemscope itemtype="http://schema.org/DataDownload">
-                                <@externalstorageLink attachment.resource; url>
+                                <@externalstorageLink item=attachment.resource earlyAccessKey=hstRequest.request.getParameter("key"); url>
                                 <a title="${attachment.text}"
                                    href="${url}"
                                    class="block-link"
@@ -229,7 +229,7 @@
 <#if publication?? >
     <article class="article article--publication" itemscope itemtype="http://schema.org/Dataset" aria-label="Document Header">
         <meta itemprop="license" content="https://digital.nhs.uk/about-nhs-digital/terms-and-conditions" />
-        <#if publication.publiclyAccessible || publication.isCorrectAccessKey(hstRequest.request.getParameter("key"))>
+        <#if !publication.beforePublicationDate || publication.isCorrectAccessKey(hstRequest.request.getParameter("key"))>
             <@fullContentOfPubliclyAvailablePublication/>
         <#else>
             <@restrictedContentOfUpcomingPublication/>

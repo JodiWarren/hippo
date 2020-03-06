@@ -43,6 +43,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 import javax.jcr.Node;
@@ -52,11 +53,10 @@ import javax.jcr.NodeIterator;
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.management.*")
 @PowerMockRunnerDelegate(DataProviderRunner.class)
-@PrepareForTest({HstQueryBuilder.class, Publication.class})
+@PrepareForTest({HstQueryBuilder.class, Publication.class, LocalDateTime.class})
 public class PublicationTest {
 
     private static final String NOMINAL_DATE_PROPERTY_KEY = "publicationsystem:NominalDate";
-    private static final String PUBLICLY_ACCESSIBLE_PROPERTY_KEY = "publicationsystem:PubliclyAccessible";
     private static final String ATTACHMENTS_PROPERTY_KEY = "publicationsystem:Attachments-v3";
     private static final String RELATED_LINKS_PROPERTY_KEY = "publicationsystem:RelatedLinks";
     private static final String RESOURCE_LINKS_PROPERTY_KEY = "publicationsystem:ResourceLinks";
@@ -111,6 +111,11 @@ public class PublicationTest {
         // Mock this static method so we can simulate the building and execution of a query
         PowerMockito.mockStatic(HstQueryBuilder.class);
         PowerMockito.when(HstQueryBuilder.create(folder)).thenReturn(queryBuilder);
+
+        PowerMockito.mockStatic(LocalDateTime.class);
+        PowerMockito.when(LocalDateTime.now(any(ZoneId.class))).thenReturn(
+            ZonedDateTime.of(2010, 3, 31, 9, 20, 0, 0, ZoneId.systemDefault())
+                .toLocalDateTime());
 
         given(queryBuilder.ofTypes(any(Class.class))).willReturn(queryBuilder);
         given(queryBuilder.orderByDescending(anyString())).willReturn(queryBuilder);
@@ -181,7 +186,8 @@ public class PublicationTest {
         final Method forbiddenGetter) throws Exception {
 
         // given
-        setBeanProperty(PUBLICLY_ACCESSIBLE_PROPERTY_KEY, false);
+        setBeanProperty(NOMINAL_DATE_PROPERTY_KEY, new Calendar.Builder()
+            .setDate(2010, Calendar.JUNE, 3).setTimeOfDay(0, 0, 0).build());
 
         try {
             // when
@@ -208,7 +214,8 @@ public class PublicationTest {
     public void permitsAllGetters_whenPublicationFlaggedAsPubliclyAvailable(final Method permittedGetter) throws Exception {
 
         // given
-        setBeanProperty(PUBLICLY_ACCESSIBLE_PROPERTY_KEY, true);
+        setBeanProperty(NOMINAL_DATE_PROPERTY_KEY, new Calendar.Builder()
+            .setDate(2010, Calendar.MARCH, 3).setTimeOfDay(0, 0, 0).build());
 
         // some getters have arguments so we need to construct mocked instances and pass them in as parameters
         Object[] args = Arrays.stream(permittedGetter.getParameterTypes())
@@ -337,11 +344,7 @@ public class PublicationTest {
     }
 
     private static LocalDate toLocalDate(final Calendar calendar) {
-        return LocalDate.from(
-            LocalDateTime.ofInstant(
-                calendar.toInstant(),
-                calendar.getTimeZone().toZoneId()
-            )
-        );
+        return LocalDate
+            .from(calendar.toInstant().atZone(calendar.getTimeZone().toZoneId()));
     }
 }
