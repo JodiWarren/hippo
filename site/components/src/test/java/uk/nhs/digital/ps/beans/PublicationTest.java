@@ -9,7 +9,9 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
+import static uk.nhs.digital.ps.beans.PublicationBase.EARLY_ACCESS_KEY_QUERY_PARAM;
 import static uk.nhs.digital.ps.beans.RestrictableDateTest.assertRestrictableDate;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
@@ -48,12 +50,13 @@ import java.time.ZonedDateTime;
 import java.util.*;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
+import javax.servlet.http.HttpServletRequest;
 
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore("javax.management.*")
 @PowerMockRunnerDelegate(DataProviderRunner.class)
-@PrepareForTest({HstQueryBuilder.class, Publication.class, LocalDateTime.class})
+@PrepareForTest({HstQueryBuilder.class, Publication.class, RequestContextProvider.class})
 public class PublicationTest {
 
     private static final String NOMINAL_DATE_PROPERTY_KEY = "publicationsystem:NominalDate";
@@ -76,6 +79,9 @@ public class PublicationTest {
     @Mock private HstQueryBuilder queryBuilder;
     @Mock private HstQuery query;
     @Mock private HstQueryResult queryResult;
+
+    @Mock private HstRequestContext hstRequestContext;
+    @Mock private HttpServletRequest httpServletRequest;
 
     private final Map<String, Object> beanProperties = new HashMap<>();
     private Publication publication;
@@ -116,6 +122,11 @@ public class PublicationTest {
         PowerMockito.when(LocalDateTime.now(any(ZoneId.class))).thenReturn(
             ZonedDateTime.of(2010, 3, 31, 9, 20, 0, 0, ZoneId.systemDefault())
                 .toLocalDateTime());
+
+        // mocks for early access key
+        PowerMockito.mockStatic(RequestContextProvider.class);
+        PowerMockito.when(RequestContextProvider.get()).thenReturn(hstRequestContext);
+        when(hstRequestContext.getServletRequest()).thenReturn(httpServletRequest);
 
         given(queryBuilder.ofTypes(any(Class.class))).willReturn(queryBuilder);
         given(queryBuilder.orderByDescending(anyString())).willReturn(queryBuilder);
@@ -278,23 +289,26 @@ public class PublicationTest {
 
     @Test
     public void returnsFalseWhenNoAccessKeySet() {
-        final boolean isCorrectAccessKey = publication.isCorrectAccessKey("123");
-        Assert.assertFalse(isCorrectAccessKey);
+        when(httpServletRequest.getParameter(EARLY_ACCESS_KEY_QUERY_PARAM)).thenReturn("123");
+
+        Assert.assertFalse(publication.isCorrectAccessKey());
     }
 
     @Test
     public void returnsFalseWhenIncorrectAccessKey() {
         setBeanProperty(EARLY_ACCESS_KEY, "923hrjfshd8998fjHUHUFD283747JSZKFJSsdfsdDJ");
-        final boolean isCorrectAccessKey = publication.isCorrectAccessKey("123");
-        Assert.assertFalse(isCorrectAccessKey);
+        when(httpServletRequest.getParameter(EARLY_ACCESS_KEY_QUERY_PARAM)).thenReturn("123");
+
+        Assert.assertFalse(publication.isCorrectAccessKey());
     }
 
     @Test
     public void returnsTrueWhenCorrectAccessKey() {
         final String accessKey = "923hrjfshd8998fjHUHUFD283747JSZKFJSsdfsdDJ";
         setBeanProperty(EARLY_ACCESS_KEY, accessKey);
-        final boolean isCorrectAccessKey = publication.isCorrectAccessKey(accessKey);
-        Assert.assertTrue(isCorrectAccessKey);
+        when(httpServletRequest.getParameter(EARLY_ACCESS_KEY_QUERY_PARAM)).thenReturn(accessKey);
+
+        Assert.assertTrue(publication.isCorrectAccessKey());
     }
 
     /**

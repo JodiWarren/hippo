@@ -70,7 +70,7 @@
 
 <#if page.publication??>
     <article class="article article--chaptered-publication" itemscope itemtype="http://schema.org/WebPage">
-        <#if !page.publication.beforePublicationDate || page.publication.isCorrectAccessKey(hstRequest.request.getParameter("key"))>
+        <#if page.publication.publiclyAccessible>
             <@fullContentOfPubliclyAvailablePublicationForChildPage/>
         <#else>
             <@restrictedContentOfUpcomingPublicationForChildPage/>

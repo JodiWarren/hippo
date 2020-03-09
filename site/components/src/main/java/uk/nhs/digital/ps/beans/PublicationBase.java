@@ -43,6 +43,7 @@ public abstract class PublicationBase extends BaseDocument {
 
     public static final int HOUR_OF_PUBLIC_RELEASE = 9;
     public static final int MINUTE_OF_PUBLIC_RELEASE = 30;
+    public static final String EARLY_ACCESS_KEY_QUERY_PARAM = "key";
 
     private RestrictableDate nominalPublicationDate;
 
@@ -188,7 +189,7 @@ public abstract class PublicationBase extends BaseDocument {
     }
 
     public boolean isPubliclyAccessible() {
-        return !getBeforePublicationDate();
+        return !getBeforePublicationDate() || isCorrectAccessKey();
     }
 
     @HippoEssentialsGenerated(internalName = PropertyKeys.RELATED_LINKS)
@@ -253,7 +254,7 @@ public abstract class PublicationBase extends BaseDocument {
             isPropertyAlwaysPermitted(propertyKey)
                 || isPubliclyAccessible()
                 || propertiesPermittedWhenUpcoming.contains(propertyKey)
-                || correctAccessKey();
+                || isCorrectAccessKey();
 
         if (!isPropertyPermitted) {
             throw new DataRestrictionViolationException(
@@ -262,11 +263,12 @@ public abstract class PublicationBase extends BaseDocument {
         }
     }
 
-    private boolean correctAccessKey() {
+    public boolean isCorrectAccessKey() {
         return StringUtils
             .isNotBlank(getProperty(PublicationBase.PropertyKeys.EARLY_ACCESS_KEY))
             && getProperty(PublicationBase.PropertyKeys.EARLY_ACCESS_KEY).equals(
-            RequestContextProvider.get().getServletRequest().getParameter("key"));
+            RequestContextProvider.get().getServletRequest().getParameter(
+                EARLY_ACCESS_KEY_QUERY_PARAM));
     }
 
     private boolean isPropertyAlwaysPermitted(final String propertyKey) {

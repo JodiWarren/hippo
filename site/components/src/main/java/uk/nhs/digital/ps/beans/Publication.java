@@ -1,6 +1,5 @@
 package uk.nhs.digital.ps.beans;
 
-import org.apache.commons.lang.StringUtils;
 import org.hippoecm.hst.content.beans.Node;
 import org.hippoecm.hst.content.beans.standard.HippoHtml;
 import org.onehippo.cms7.essentials.dashboard.annotations.HippoEssentialsGenerated;
@@ -78,12 +77,5 @@ public class Publication extends PublicationBase implements Paginated {
     @Override
     public Pagination paginate() {
         return new Pagination(null, getPageIndex().stream().skip(1).findFirst().orElse(null));
-    }
-
-    public Boolean isCorrectAccessKey(String accessKey) {
-        return StringUtils
-            .isNotBlank(getProperty(PublicationBase.PropertyKeys.EARLY_ACCESS_KEY))
-            && getProperty(PublicationBase.PropertyKeys.EARLY_ACCESS_KEY)
-            .equals(accessKey);
     }
 }

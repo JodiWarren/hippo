@@ -6,7 +6,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -18,8 +17,6 @@ import org.hippoecm.repository.api.WorkflowException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.onehippo.repository.documentworkflow.DocumentHandle;
 import org.onehippo.repository.documentworkflow.DocumentVariant;
 import uk.nhs.digital.ps.JcrProvider;
@@ -27,6 +24,7 @@ import uk.nhs.digital.ps.JcrProvider;
 import java.io.FileInputStream;
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +35,7 @@ import javax.jcr.Session;
 @RunWith(DataProviderRunner.class)
 public class SearchableFlagTaskTest {
 
-    @Mock
-    Clock clock;
-    private SearchableFlagTask searchableFlagTask = new SearchableFlagTask(clock);
+    private SearchableFlagTask searchableFlagTask;
     private Session session;
     private Node rootNode = null;
 
@@ -47,7 +43,10 @@ public class SearchableFlagTaskTest {
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
+        Clock clock = Clock
+            .fixed(LocalDateTime.of(2017, 3, 2, 0, 0).toInstant(ZoneOffset.UTC),
+                ZoneId.systemDefault());
+        searchableFlagTask = new SearchableFlagTask(clock);
 
         session = new JcrProvider()
             .getJcrFromFixture(new FileInputStream(
@@ -57,8 +56,6 @@ public class SearchableFlagTaskTest {
         WorkflowContext workflowContext = mock(WorkflowContext.class);
         given(workflowContext.getInternalWorkflowSession()).willReturn(session);
         searchableFlagTask.setWorkflowContext(workflowContext);
-        when(clock.instant()).thenReturn(
-            LocalDateTime.of(2017, 3, 2, 0, 0).toInstant(ZoneOffset.UTC));
     }
 
     private String getResult(String state) {

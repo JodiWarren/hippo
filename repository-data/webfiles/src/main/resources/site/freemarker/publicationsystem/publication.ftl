@@ -20,6 +20,8 @@
 <#assign document = publication />
 <#assign idsuffix = slugify(publication.title) />
 <#assign hasRelatedNews = publication.relatedNews?has_content>
+<#assign earlyAccessKey = hstRequest.request.getParameter("key")>
+
 <@metaTags></@metaTags>
 
 <#macro restrictedContentOfUpcomingPublication>
@@ -49,7 +51,7 @@
         || (publication.keyFactsTail?? && publication.keyFactsTail.content?has_content)
         || (publication.keyFactInfographics?? && publication.keyFactInfographics?size >0)  />
 
-    <@publicationHeader publication=publication earlyAccessKey=hstRequest.request.getParameter("key")/>
+    <@publicationHeader publication=publication earlyAccessKey=earlyAccessKey/>
 
     <div class="grid-wrapper grid-wrapper--article" aria-label="Document Content">
 
@@ -142,7 +144,9 @@
                         <ul data-uipath="ps.publication.datasets">
                             <#list publication.datasets as dataset>
                                 <li itemprop="hasPart" itemscope itemtype="http://schema.org/Dataset">
-                                  <a itemprop="url" href="<@hst.link hippobean=dataset.selfLinkBean/>" title="${dataset.title}">
+                                  <a itemprop="url" href="<@hst.link hippobean=dataset.selfLinkBean>
+                                      <#if earlyAccessKey?has_content><@hst.param name="key" value="${earlyAccessKey}"/></#if>
+                                  </@hst.link>" title="${dataset.title}">
                                     <span itemprop="name">${dataset.title}</span>
                                   </a>
                                   <#list dataset.summary.elements as element>
@@ -162,7 +166,7 @@
                         <ul data-uipath="ps.publication.resources-attachments" class="list list--reset">
                         <#list publication.attachments as attachment>
                             <li class="attachment" itemprop="distribution" itemscope itemtype="http://schema.org/DataDownload">
-                                <@externalstorageLink item=attachment.resource earlyAccessKey=hstRequest.request.getParameter("key"); url>
+                                <@externalstorageLink item=attachment.resource earlyAccessKey=earlyAccessKey; url>
                                 <a title="${attachment.text}"
                                    href="${url}"
                                    class="block-link"
@@ -217,7 +221,7 @@
                 <@lastModified publication.lastModified></@lastModified>
 
                 <div class="article-section no-border no-top-margin">
-                    <@pagination page=publication earlyAccessKey=hstRequest.request.getParameter("key")/>
+                    <@pagination page=publication earlyAccessKey=earlyAccessKey/>
                 </div>
 
             </div>
@@ -229,7 +233,7 @@
 <#if publication?? >
     <article class="article article--publication" itemscope itemtype="http://schema.org/Dataset" aria-label="Document Header">
         <meta itemprop="license" content="https://digital.nhs.uk/about-nhs-digital/terms-and-conditions" />
-        <#if !publication.beforePublicationDate || publication.isCorrectAccessKey(hstRequest.request.getParameter("key"))>
+        <#if publication.publiclyAccessible>
             <@fullContentOfPubliclyAvailablePublication/>
         <#else>
             <@restrictedContentOfUpcomingPublication/>

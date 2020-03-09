@@ -7,7 +7,9 @@ import org.apache.jackrabbit.value.LongValue;
 import org.hippoecm.repository.ext.DerivedDataFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.nhs.digital.externalstorage.workflow.externalFilePublish.ExternalFilePublishTask;
 
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Map;
 import javax.jcr.Value;
@@ -30,13 +32,10 @@ public class OrderedSearchDateDerivedDataFunction extends DerivedDataFunction {
                 return emptyMap();
             }
 
-            Value[] publiclyAccessibleValues = parameters.get("publiclyAccessible");
-
             Calendar date = dateValues[0].getDate();
-            boolean publiclyAccessible = isEmpty(publiclyAccessibleValues) || publiclyAccessibleValues[0].getBoolean();
 
             long orderedSearchDate = date.getTimeInMillis();
-            if (!publiclyAccessible) {
+            if (!isPublic(date)) {
                 orderedSearchDate *= -1;
             }
 
@@ -48,5 +47,17 @@ public class OrderedSearchDateDerivedDataFunction extends DerivedDataFunction {
 
             return emptyMap();
         }
+    }
+
+    private boolean isPublic(Calendar publicationDate) {
+        LocalDateTime publicationDateTime = publicationDate.toInstant()
+            .atZone(ExternalFilePublishTask.LONDON_ZONE_ID).toLocalDateTime()
+            .withHour(ExternalFilePublishTask.HOUR_OF_PUBLICATION_RELEASE).withMinute(
+                ExternalFilePublishTask.MINUTE_OF_PUBLICATION_RELEASE)
+            .withSecond(0);
+
+        LocalDateTime currentDateTime = LocalDateTime.now(ExternalFilePublishTask.LONDON_ZONE_ID);
+
+        return !currentDateTime.isBefore(publicationDateTime);
     }
 }

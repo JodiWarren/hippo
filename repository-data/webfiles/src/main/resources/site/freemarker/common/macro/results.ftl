@@ -30,7 +30,7 @@
                      document.class.name == "uk.nhs.digital.website.beans.VisualHub">
                 <!-- showing title deliberately disabled for these doctypes -->
                 <@genericSearchElement item=document isShowTitle=false elemDate="" />
-            <#elseif document.class.name == "uk.nhs.digital.website.beans.Gdprtransparency" 
+            <#elseif document.class.name == "uk.nhs.digital.website.beans.Gdprtransparency"
                   || document.class.name == "uk.nhs.digital.website.beans.Service"
                   || document.class.name == "uk.nhs.digital.website.beans.Roadmap"
                   || document.class.name == "uk.nhs.digital.website.beans.RoadmapItem"
@@ -87,7 +87,7 @@
             </div>
         </#if>
 
-        <#if !item.beforePublicationDate>
+        <#if item.publiclyAccessible>
             <p class="cta__text" data-uipath="ps.search-results.result.summary">
                 <@truncate text=item.summary.firstParagraph size="300"/>
             </p>
