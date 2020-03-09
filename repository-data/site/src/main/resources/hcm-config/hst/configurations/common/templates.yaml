@@ -140,6 +140,9 @@ definitions:
       /menu:
         hst:renderpath: webfile:/freemarker/common/menu.ftl
         jcr:primaryType: hst:template
+      /news-events-homepage:
+        hst:renderpath: webfile:/freemarker/common/news-events-homepage.ftl
+        jcr:primaryType: hst:template
       /news-article:
         hst:renderpath: webfile:/freemarker/common/news-article.ftl
         jcr:primaryType: hst:template
