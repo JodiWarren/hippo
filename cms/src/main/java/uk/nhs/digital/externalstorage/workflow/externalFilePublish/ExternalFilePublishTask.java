@@ -6,6 +6,8 @@ import static uk.nhs.digital.ps.PublicationSystemConstants.INDEX_FILE_NAME;
 import org.hippoecm.repository.api.WorkflowException;
 import org.onehippo.repository.documentworkflow.DocumentHandle;
 import org.onehippo.repository.documentworkflow.DocumentVariant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import uk.nhs.digital.externalstorage.ExternalStorageConstants;
 import uk.nhs.digital.externalstorage.s3.PooledS3Connector;
 import uk.nhs.digital.externalstorage.workflow.AbstractExternalFileTask;
@@ -32,6 +34,8 @@ public class ExternalFilePublishTask extends AbstractExternalFileTask {
     static final String TAG_EARLY_ACCESS_KEY = "EARLY_ACCESS_KEY";
 
     private final transient Clock clock;
+
+    private static final Logger LOG = LoggerFactory.getLogger(ExternalFilePublishTask.class);
 
     public ExternalFilePublishTask(Clock clock) {
         super();
@@ -60,7 +64,12 @@ public class ExternalFilePublishTask extends AbstractExternalFileTask {
                 String externalResource = node
                     .getProperty(ExternalStorageConstants.PROPERTY_EXTERNAL_STORAGE_REFERENCE)
                     .getString();
-                s3Job.accept(externalResource);
+
+                try {
+                    s3Job.accept(externalResource);
+                } catch (Exception ex) {
+                    LOG.error("Error while publishing S3 resource: {}", externalResource);
+                }
             }
         }
     }
