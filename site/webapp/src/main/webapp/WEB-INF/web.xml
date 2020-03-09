@@ -58,6 +58,19 @@
     </param-value>
   </context-param>
 
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+            /WEB-INF/applicationContext.xml
+            /WEB-INF/applicationContext-security.xml
+        </param-value>
+    </context-param>
+
+    <filter>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+
   <!-- IMPORTANT
   XSSUrlFilter should ALWAYS be the FIRST filter applied in the configuration
   https://www.onehippo.org/library/concepts/web-application/xss-and-crlf-injection-prevention-with-hst-2.html
@@ -127,6 +140,12 @@
     </init-param>
   </filter>
 
+    <filter-mapping>
+        <filter-name>springSecurityFilterChain</filter-name>
+        <url-pattern>/*</url-pattern>
+        <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+
   <filter-mapping>
     <filter-name>CharacterEncodingFilter</filter-name>
     <url-pattern>/*</url-pattern>
@@ -159,6 +178,10 @@
     <dispatcher>REQUEST</dispatcher>
     <dispatcher>FORWARD</dispatcher>
   </filter-mapping>
+
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
 
   <!-- HstContextLoaderListener configuring/initializing/destroying HST Container -->
   <listener>
