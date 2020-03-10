@@ -8,6 +8,7 @@
 
 <#assign latestNews="Latest news" />
 <#assign latestBlogs="Latest blog" />
+<#assign features="Features" />
 <#assign resources="Resources" />
 <#assign contactUs="Contact us" />
 <#assign followSocial="Follow us on social media" />
@@ -25,10 +26,10 @@
                     <div class="grid-row">
                         <div class="column--two-thirds column--reset">
                             <h1 class="local-header__title" data-uipath="document.title">News and Events</h1>
-                            <p class="article-header__subtitle">Find all the latest news and events related content.</p>
+                            <p class="article-header__subtitle" data-uipath="website.news-events-homepage.summary">Find all the latest news and events related content.</p>
                         </div>
                         <div class="column--one-third column--reset">
-                            <img src="<@hst.webfile path="images/penpaper.svg" fullyQualified=true/>" alt="News article">
+                            <img src="<@hst.webfile path="images/penpaper.svg" fullyQualified=true/>" alt="News and Events">
                         </div>
                     </div>
                 </div>
@@ -40,7 +41,7 @@
         <div class="grid-row">
             <div class="column column--one-quarter page-block page-block--sidebar">
                 <div id="sticky-nav">
-                    <#assign index = [latestNews, latestBlogs, resources, contactUs, followSocial] />
+                    <#assign index = [latestNews, latestBlogs, features, resources, contactUs, followSocial] />
 
                     <#assign links = [] />
 
@@ -77,8 +78,8 @@
                     <div class="grid-row">
                         <div class="column column--reset">
                             <div class="hub-box-list bottom-margin-20" id="${slugify(latestBlogs)}-list">
-                                <#assign newsData = [{}] />
-                                <#list newsData as news>
+                                <#assign blogData = [{}] />
+                                <#list blogData as blog>
                                     <#assign data = {"title": "HSCN Summit 2018", "date": "18 January 2018", "text": "Conveniently orchestrate user friendly models without revolutionary.", "imagesection": "EMPTY", "link": "#" } />
                                     <#assign data += noBorder + noBackgroundCol + noPadding + sameStyle/>
                                     <@hubBox data ></@hubBox>
@@ -88,6 +89,22 @@
                     </div>
                     <div class="grid-row bottom-margin-20">
                         <a href="#">View all blogs</a>
+                    </div>
+                </div>
+
+                <div class="article-section article-section--letter-group" id="${slugify(features)}">
+                    <h2>${features}</h2>
+                    <div class="grid-row">
+                        <div class="column column--reset">
+                            <div class="hub-box-list bottom-margin-20" id="${slugify(features)}-list">
+                                <#assign featureData = [{}, {}] />
+                                <#list featureData as feature>
+                                    <#assign data = {"title": "HSCN Summit 2018", "date": "18 January 2018", "text": "Conveniently orchestrate user friendly models without revolutionary.", "imagesection": "EMPTY", "link": "#" } />
+                                    <#assign data += noBorder + noBackgroundCol + noPadding + sameStyle/>
+                                    <@hubBox data ></@hubBox>
+                                </#list>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -102,12 +119,14 @@
                                 {"title": "Supplementary information", "text": "Conveniently orchestrate user friendly models without revolutionary.", "link": "#" },
                                 {"title": "NHS Digital style guidelines", "text": "Conveniently orchestrate user friendly models without revolutionary.", "link": "#" }
                                 ] />
-                                <#assign item = {} />
-                                <#list resources as resource>
-                                    <#assign item = resource />
-                                    <#assign item += noBorder + noBackgroundCol + noPadding + sameStyle/>
-                                    <@hubBox item ></@hubBox>
-                                </#list>
+                                <ul class="list list--reset">
+                                    <#list resources as resource>
+                                        <li>
+                                            <a href="#">${resource.title}</a>
+                                            <p>${resource.text}</p>
+                                        </li>
+                                    </#list>
+                                </ul>
                             </div>
                         </div>
                     </div>

@@ -29,8 +29,8 @@
                     <p class="hub-box__text">Use the block link component to create a large clickable link. Suitable for use in a download list.</p>
                 </div>
             </article>
-            
-            <article class="hub-box hub-box--light">
+
+            <article class="hub-box">
                 <div class="hub-box__contents">
                     <h2 class="hub-box__title"><a href="/site/static-ui/component/button">Button</a></h2>
                     <span class="hub-box__meta">Created February 2020</span>
@@ -38,7 +38,7 @@
                 </div>
             </article>
 
-            <article class="hub-box hub-box--light">
+            <article class="hub-box">
                 <div class="hub-box__contents">
                     <h2 class="hub-box__title"><a href="/site/static-ui/component/infographic">Infographic</a></h2>
                     <span class="hub-box__meta">Created February 2019</span>
