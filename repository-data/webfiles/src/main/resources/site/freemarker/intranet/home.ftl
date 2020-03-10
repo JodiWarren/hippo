@@ -20,12 +20,16 @@
                     <#if hstRequest.userPrincipal??>
 
                         <p>Welcome <strong>${hstRequest.userPrincipal.name}</strong>!</p>
-                        <form name="logoutForm" method="post" action="<@hst.link path="/logout"/>">
-                            <#if _csrf??>
-                                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                            </#if>
-                            <input type="submit" name="logoutButton" value="Log out" />
-                        </form>
+                        <div>
+                            <@hst.link var="logoutUrl" path="/saml/logout" />
+                            <form class="left" action="${logoutUrl}" method="get">
+                                <input type="submit" value="Global Logout" class="button"/>
+                            </form>
+                            <form class="left" action="${logoutUrl}" method="get">
+                                <input type="hidden" name="local" value="true"/>
+                                <input type="submit" value="Local Logout" class="button"/>
+                            </form>
+                        </div>
                     </#if>
                 </div>
             </div>
