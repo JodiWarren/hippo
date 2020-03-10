@@ -55,14 +55,14 @@
 
     <beans:bean id="successRedirectHandler"
           class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler">
-        <beans:property name="defaultTargetUrl" value="/"/>
+        <beans:property name="defaultTargetUrl" value="/intranet"/>
     </beans:bean>
 
     <!-- Handler deciding where to redirect user after failed login -->
     <beans:bean id="failureRedirectHandler"
           class="org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler">
         <beans:property name="useForward" value="true"/>
-        <beans:property name="defaultFailureUrl" value="/error.jsp"/>
+        <beans:property name="defaultFailureUrl" value="/jsp/errorpages/ErrorPage401.jsp"/>
     </beans:bean>
 
     <!-- Handler for successful logout -->
@@ -78,9 +78,9 @@
     <!-- Logger for SAML messages and events -->
     <beans:bean id="samlLogger" class="org.springframework.security.saml.log.SAMLDefaultLogger">
         <!-- Enable these to see the actual SAML Messages in logs -->
-         <beans:property name="logAllMessages" value="true"/>
-         <beans:property name="logErrors" value="true"/>
-         <beans:property name="logMessagesOnException" value="true"/>
+<!--         <beans:property name="logAllMessages" value="true"/>-->
+<!--         <beans:property name="logErrors" value="true"/>-->
+<!--         <beans:property name="logMessagesOnException" value="true"/>-->
     </beans:bean>
 
     <!-- Central storage of cryptographic keys -->
@@ -112,7 +112,7 @@
     <beans:bean id="metadataGeneratorFilter" class="org.springframework.security.saml.metadata.MetadataGeneratorFilter">
         <beans:constructor-arg>
             <beans:bean class="org.springframework.security.saml.metadata.MetadataGenerator">
-                <beans:property name="entityId" value="urn:test:alexmitcu:manchester"/>
+                <beans:property name="entityId" value="urn:nhs:digital:uk"/>
                 <beans:property name="extendedMetadata">
                     <beans:bean class="org.springframework.security.saml.metadata.ExtendedMetadata">
                         <beans:property name="signMetadata" value="false"/>
